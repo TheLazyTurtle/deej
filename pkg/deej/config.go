@@ -2,6 +2,7 @@ package deej
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"strings"
 	"time"
@@ -83,7 +84,14 @@ func NewConfig(logger *zap.SugaredLogger, notifier Notifier) (*CanonicalConfig, 
 	userConfig := viper.New()
 	userConfig.SetConfigName(userConfigName)
 	userConfig.SetConfigType(configType)
-	userConfig.AddConfigPath(userConfigPath)
+
+	value, exists := os.LookupEnv("DEEJ_CONFIG_PATH")
+	if exists {
+		println(value)
+		userConfig.AddConfigPath(value)
+	} else {
+		userConfig.AddConfigPath(userConfigPath)
+	}
 
 	userConfig.SetDefault(configKeySliderMapping, map[string][]string{})
 	userConfig.SetDefault(configKeyInvertSliders, false)
